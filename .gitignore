@@ -108,3 +108,5 @@ venv.bak/
 
 # vscode
 .vscode
+
+GoogleNews-vectors-negative300.bin
