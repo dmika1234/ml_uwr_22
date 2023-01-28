@@ -39,3 +39,30 @@ class DataPreprocessor:
 
         return text_data
 
+
+class TextTransformer(Word2Vec):
+    def __init__(self, data, vector_size=20, min_count=1) -> None:
+        self.data = data
+        super().__init__(data, vector_size=vector_size, min_count=min_count)
+
+    def get_agg_word2vec(self, text, agg_func=np.mean):
+        # Get the word2vec representation of each word in the text
+        word_vectors = np.array([self.wv[word] for word in text if word in self.wv.index_to_key])
+        res = agg_func(word_vectors, axis=0)
+        if np.isnan(res).any():
+            res = np.zeros(self.vector_size)
+        return res
+
+    def transform_data(self, column_name, data=None):
+        if data is None:
+            data = self.data
+        n = data.shape[0]
+        print(f'Transforming {column_name} data should take around {(n / 90 / 60):3f} minutes')
+        X_train_vectors = data.apply(lambda x: self.get_agg_word2vec(x))
+        X_train_vectors = np.array(X_train_vectors)
+        X_train_vectors = np.vstack(X_train_vectors)
+        df_train = pd.DataFrame(X_train_vectors,
+         columns=['num_' + column_name + '_' + str(nr) for nr in np.arange(20)])
+        self.data_transformed = df_train
+        return df_train
+    
