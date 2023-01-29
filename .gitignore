@@ -110,3 +110,4 @@ venv.bak/
 .vscode
 
 GoogleNews-vectors-negative300.bin
+X_w2v.csv
