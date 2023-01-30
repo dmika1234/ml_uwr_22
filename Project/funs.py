@@ -72,7 +72,7 @@ class TextTransformer(Word2Vec):
 class GoogleTextTransformer:
     def __init__(self, path_to_model='GoogleNews-vectors-negative300.bin') -> None:
         self.wv = KeyedVectors.load_word2vec_format(path_to_model, binary=True)
-        self.vector_size = self.wv.vetor_size
+        self.vector_size = self.wv.vector_size
 
     def get_agg_word2vec(self, text, agg_func=np.mean):
         # Get the word2vec representation of each word in the text
@@ -92,7 +92,7 @@ class GoogleTextTransformer:
         df_train = pd.DataFrame(X_train_vectors,
          columns=['num_' + column_name + '_' + str(nr) for nr in np.arange(self.vector_size)])
         self.data_transformed = df_train
-        return df_train        
+        return df_train   
     
 
 def get_train_test_indcs(X, y, test_size, random_state, stratify):
