@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, roc_auc_score
 
@@ -101,8 +100,9 @@ def get_train_test_indcs(X, y, test_size, random_state, stratify):
     return X_train.index, X_test.index
 
 
-def evaluate_performance(y_test, y_proba, threshold=0.2, round=4, save_pred=False):
-    y_pred = (y_proba >= threshold).astype('int64')
+def evaluate_performance(y_test, y_pred, prob=False, threshold=0.2, round=4, save_pred=False):
+    if prob:
+        y_pred = (y_pred >= threshold).astype('int64')
     results = {}
     if save_pred:
         results['y_pred'] = y_pred
