@@ -77,7 +77,7 @@ class BagofWords:
     
     def encode_onehot(self, nr_of_words = 1000):
         self.get_all_words()
-        self.get_most_pop_words(nr_of_words = 1000)
+        self.get_most_pop_words(nr_of_words)
         self.prepare_onehot_dfs()
         return self.get_onehot_dfs()
 
