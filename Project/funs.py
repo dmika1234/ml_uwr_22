@@ -118,6 +118,6 @@ def evaluate_performance(y_test, y_pred, prob=False, threshold=0.2, round=4, sav
     # Calculate F1-score
     results['f1_score'] = np.round(2 * (results['precision'] * results['detection_percentage']) /\
                           (results['precision'] + results['detection_percentage']), round)
-    results['auc_roc'] = np.round(roc_auc_score(y_test, y_proba), round)
+    results['auc_roc'] = np.round(roc_auc_score(y_test, y_pred), round)
 
     return results
