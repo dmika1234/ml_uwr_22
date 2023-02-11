@@ -7,9 +7,11 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
 from nltk.stem import WordNetLemmatizer
+from collections import Counter
 
 from gensim.models import Word2Vec
 from gensim.models import KeyedVectors
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 def join_fun(list, sep=' '):
@@ -39,6 +41,61 @@ class DataPreprocessor:
                 text_data.at[i,col] = vectorize_fun(filtered_sentence)
 
         return text_data
+
+
+class BagofWords:
+    def __init__(self, text_data, text_colnames) -> None:
+        self.text_data = text_data
+        self.text_colnames = text_colnames
+        self.all_words = {}
+        self.most_popular_words = {}
+        self.nr_of_words = 1000
+        self.onehot_dfs = {}
+    def get_all_words(self):
+        for column_name in self.text_colnames:
+            self.all_words[column_name] = np.concatenate(self.text_data[column_name])
+
+    def get_most_pop_words(self, nr_of_words = 1000):
+        self.nr_of_words = nr_of_words
+        for column_name in self.text_colnames:
+            count_words = Counter(self.all_words[column_name])
+            self.most_popular_words[column_name] = np.array(count_words.most_common(self.nr_of_words))[:,0]
+    
+    def prepare_onehot_dfs(self):
+        for text_colname in self.text_colnames:
+            onehot_array = np.zeros((self.text_data.shape[0], self.nr_of_words))
+            for i in np.arange(self.text_data.shape[0]):
+                onehot_array[i] = np.isin(self.most_popular_words[text_colname], self.text_data[text_colname][i]).astype('int64')
+            column_names = np.vectorize(lambda x: text_colname + '_' + str(x))(self.most_popular_words[text_colname])
+            self.onehot_dfs[text_colname] = pd.DataFrame(onehot_array, columns=column_names)
+
+    def get_onehot_dfs(self):
+        X = pd.DataFrame()
+        for text_colname in text_colnames:
+            X = pd.concat((X, self.onehot_dfs[text_colname]), axis=1)
+            return X
+    
+    def encode_onehot(self, nr_of_words = 1000):
+        self.get_all_words()
+        self.get_most_pop_words(nr_of_words = 1000)
+        self.prepare_onehot_dfs()
+        return self.get_onehot_dfs()
+
+
+
+class TfidTranformer:
+    def __init__(self, number_of_vars = 50):
+        self.number_of_vars = number_of_vars
+        self.X_tfdif = pd.DataFrame()
+    
+    def vectorize_transform(self, text_data_str, train_indcs, text_colnames):
+        for colname in text_colnames:
+            vectorizer = TfidfVectorizer(max_features=number_of_vars, min_df=2).fit(text_data_str[colname][train_indcs])
+            df_transformed = pd.DataFrame(vectorizer.transform(text_data_str[colname]).toarray(), 
+            columns=['num_' + colname + '_' + str(nr) for nr in np.arange(number_of_vars)])
+            print(f'{colname} data successfuly transformed!')
+            self.X_tfdif = pd.concat((self.X_tfdif, df_transformed), axis=1)
+        return self.X_tfdif
 
 
 class TextTransformer(Word2Vec):
