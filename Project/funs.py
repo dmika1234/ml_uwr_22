@@ -71,9 +71,9 @@ class BagofWords:
 
     def get_onehot_dfs(self):
         X = pd.DataFrame()
-        for text_colname in text_colnames:
+        for text_colname in self.text_colnames:
             X = pd.concat((X, self.onehot_dfs[text_colname]), axis=1)
-            return X
+        return X
     
     def encode_onehot(self, nr_of_words = 1000):
         self.get_all_words()
