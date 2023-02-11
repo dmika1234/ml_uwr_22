@@ -90,9 +90,9 @@ class TfidTranformer:
     
     def vectorize_transform(self, text_data_str, train_indcs, text_colnames):
         for colname in text_colnames:
-            vectorizer = TfidfVectorizer(max_features=number_of_vars, min_df=2).fit(text_data_str[colname][train_indcs])
+            vectorizer = TfidfVectorizer(max_features=self.number_of_vars, min_df=2).fit(text_data_str[colname][train_indcs])
             df_transformed = pd.DataFrame(vectorizer.transform(text_data_str[colname]).toarray(), 
-            columns=['num_' + colname + '_' + str(nr) for nr in np.arange(number_of_vars)])
+            columns=['num_' + colname + '_' + str(nr) for nr in np.arange(self.number_of_vars)])
             print(f'{colname} data successfuly transformed!')
             self.X_tfdif = pd.concat((self.X_tfdif, df_transformed), axis=1)
         return self.X_tfdif
